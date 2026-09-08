@@ -23,6 +23,7 @@ AUTOMATION = {
     "safe-auto", "auto-with-validation", "requires-inference",
     "requires-human-info", "requires-human-approval", "never"
 }
+EXPERIMENTAL_AUTO = {"safe-auto", "auto-with-validation", "requires-inference"}
 EVIDENCE = {"A", "B", "C", "D"}
 ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -43,6 +44,18 @@ def parse_iso_date(value: object) -> date | None:
         return None
 
 
+def validate_not_future(value: object, label: str, today: date) -> int:
+    """Validate a real ISO date and reject future verification/freshness dates."""
+    parsed = parse_iso_date(value)
+    if parsed is None:
+        fail(f"{label} must be a real YYYY-MM-DD calendar date")
+        return 1
+    if parsed > today:
+        fail(f"{label} cannot be in the future: {parsed.isoformat()}")
+        return 1
+    return 0
+
+
 def load_source_ids() -> tuple[set[str], list[str]]:
     """Load source-registry IDs and report duplicate identifiers."""
     text = SOURCE_REGISTRY.read_text(encoding="utf-8")
@@ -58,6 +71,7 @@ def load_source_ids() -> tuple[set[str], list[str]]:
 
 def main() -> int:
     errors = 0
+    today = date.today()
 
     if not SOURCE_REGISTRY.is_file():
         fail(f"missing source registry: {SOURCE_REGISTRY}")
@@ -77,10 +91,7 @@ def main() -> int:
         fail("unexpected schema_version")
         errors += 1
 
-    snapshot = payload.get("research_snapshot")
-    if parse_iso_date(snapshot) is None:
-        fail("research_snapshot must be a real YYYY-MM-DD calendar date")
-        errors += 1
+    errors += validate_not_future(payload.get("research_snapshot"), "research_snapshot", today)
 
     rules = payload.get("rules")
     if not isinstance(rules, list) or not rules:
@@ -111,6 +122,9 @@ def main() -> int:
         else:
             seen.add(rid)
 
+        if not isinstance(rule.get("category"), str) or not rule["category"].strip():
+            fail(f"{prefix}.category must be a non-empty string")
+            errors += 1
         if rule.get("scope") not in SCOPES:
             fail(f"{prefix}.scope invalid")
             errors += 1
@@ -122,6 +136,12 @@ def main() -> int:
             errors += 1
         if rule.get("evidence_level") not in EVIDENCE:
             fail(f"{prefix}.evidence_level invalid")
+            errors += 1
+        if rule.get("evidence_level") == "C" and rule.get("automation") in EXPERIMENTAL_AUTO:
+            fail(
+                f"{prefix} Evidence C experimental rules cannot be silently auto-applied; "
+                "require human information/approval or mark never"
+            )
             errors += 1
 
         for key in ("seo", "aeo", "geo"):
@@ -143,10 +163,7 @@ def main() -> int:
                     fail(f"{source_prefix} unknown source-registry ID: {source_id}")
                     errors += 1
 
-        verified = rule.get("last_verified")
-        if parse_iso_date(verified) is None:
-            fail(f"{prefix}.last_verified must be a real YYYY-MM-DD calendar date")
-            errors += 1
+        errors += validate_not_future(rule.get("last_verified"), f"{prefix}.last_verified", today)
 
         for key in ("applies_when", "check", "expected", "fix", "validation"):
             if not isinstance(rule.get(key), str) or not rule[key].strip():
@@ -159,7 +176,7 @@ def main() -> int:
 
     print(
         f"PASS: {len(rules)} rules validated; ids unique; enums, dates, "
-        f"required fields, and {len(source_ids)} source-registry IDs valid."
+        f"required fields, evidence gates, and {len(source_ids)} source-registry IDs valid."
     )
     return 0
 

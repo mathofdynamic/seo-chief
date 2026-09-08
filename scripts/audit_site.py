@@ -14,7 +14,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin, urlparse, urlunparse
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 from urllib.robotparser import RobotFileParser
 import xml.etree.ElementTree as ET
 
@@ -23,6 +23,16 @@ HTML_TYPES = ("text/html", "application/xhtml+xml")
 MAX_BYTES = 4_000_000
 SITEMAP_BYTES = 8_000_000
 MAX_SITEMAPS = 50
+
+
+class NoRedirect(HTTPRedirectHandler):
+    """Preserve redirect responses as audit evidence instead of following them."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: ANN001
+        return None
+
+
+OPENER = build_opener(NoRedirect)
 
 
 def normalize(url: str, keep_query: bool = False) -> str | None:
@@ -65,7 +75,7 @@ class Fetch:
 def fetch(url: str, timeout: float, max_bytes: int = MAX_BYTES) -> Fetch:
     req = Request(url, headers={"User-Agent": UA, "Accept": "text/html,application/xml,text/xml,*/*;q=0.1"})
     try:
-        with urlopen(req, timeout=timeout) as r:
+        with OPENER.open(req, timeout=timeout) as r:
             headers = {k.lower(): v for k, v in r.headers.items()}
             ctype = headers.get("content-type", "").split(";", 1)[0].lower() or None
             return Fetch(url, r.geturl(), r.status, ctype, headers, r.read(max_bytes + 1)[:max_bytes])
@@ -73,7 +83,9 @@ def fetch(url: str, timeout: float, max_bytes: int = MAX_BYTES) -> Fetch:
         headers = {k.lower(): v for k, v in e.headers.items()} if e.headers else {}
         ctype = headers.get("content-type", "").split(";", 1)[0].lower() or None
         body = e.read(max_bytes) if hasattr(e, "read") else b""
-        return Fetch(url, e.geturl(), e.code, ctype, headers, body, f"HTTP {e.code}")
+        location = headers.get("location")
+        final = urljoin(url, location) if location and 300 <= e.code < 400 else e.geturl()
+        return Fetch(url, final, e.code, ctype, headers, body, f"HTTP {e.code}")
     except (URLError, TimeoutError, OSError) as e:
         return Fetch(url, error=str(e))
 
@@ -195,7 +207,7 @@ def sitemap_pages(base: str, initial: list[str], timeout: float) -> tuple[list[s
     q = deque(dict.fromkeys([*initial, fallback])); seen: set[str] = set(); pages: set[str] = set(); reports = []
     while q and len(seen) < MAX_SITEMAPS:
         u = normalize(q.popleft(), True)
-        if not u or u in seen: continue
+        if not u or u in seen or not same_origin(base, u): continue
         seen.add(u); r = fetch(u, timeout, SITEMAP_BYTES); rep: dict[str, object] = {"url": u, "status": r.status, "kind": None, "entries": 0, "error": r.error}
         if r.status == 200 and r.body:
             try:

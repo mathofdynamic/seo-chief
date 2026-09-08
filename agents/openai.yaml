@@ -1,0 +1,4 @@
+interface:
+  display_name: "SEO Chief"
+  short_description: "Complete SEO, AEO, GEO audit and safe optimization"
+  default_prompt: "Use $seo-chief to audit this website and repository, fix safe SEO/AEO/GEO issues, validate the implementation, and batch any risky or keyword-targeted decisions for my approval."

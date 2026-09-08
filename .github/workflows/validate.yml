@@ -25,7 +25,10 @@ jobs:
         run: python scripts/validate_rules.py
 
       - name: Compile Python tooling
-        run: python -m py_compile scripts/validate_rules.py scripts/audit_site.py
+        run: python -m py_compile scripts/validate_rules.py scripts/audit_site.py tests/test_audit_site.py
+
+      - name: Run static audit tests
+        run: python -m unittest discover -s tests -v
 
       - name: Smoke-test static audit CLI
         run: python scripts/audit_site.py --help >/dev/null

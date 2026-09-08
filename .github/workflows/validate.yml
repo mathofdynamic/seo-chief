@@ -24,5 +24,8 @@ jobs:
       - name: Validate rule database
         run: python scripts/validate_rules.py
 
-      - name: Compile validator
-        run: python -m py_compile scripts/validate_rules.py
+      - name: Compile Python tooling
+        run: python -m py_compile scripts/validate_rules.py scripts/audit_site.py
+
+      - name: Smoke-test static audit CLI
+        run: python scripts/audit_site.py --help >/dev/null

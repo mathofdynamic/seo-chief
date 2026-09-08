@@ -23,7 +23,7 @@ AUTOMATION = {
     "safe-auto", "auto-with-validation", "requires-inference",
     "requires-human-info", "requires-human-approval", "never"
 }
-EXPERIMENTAL_AUTO = {"safe-auto", "auto-with-validation", "requires-inference"}
+AUTO_CAPABLE = {"safe-auto", "auto-with-validation", "requires-inference"}
 EVIDENCE = {"A", "B", "C", "D"}
 ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -137,29 +137,56 @@ def main() -> int:
         if rule.get("evidence_level") not in EVIDENCE:
             fail(f"{prefix}.evidence_level invalid")
             errors += 1
-        if rule.get("evidence_level") == "C" and rule.get("automation") in EXPERIMENTAL_AUTO:
+
+        evidence_level = rule.get("evidence_level")
+        automation = rule.get("automation")
+        if evidence_level == "C" and automation in AUTO_CAPABLE:
             fail(
                 f"{prefix} Evidence C experimental rules cannot be silently auto-applied; "
                 "require human information/approval or mark never"
             )
             errors += 1
+        if evidence_level == "D" and automation != "never":
+            fail(
+                f"{prefix} Evidence D rules are unsupported/obsolete/contradicted and must be "
+                "non-executable (`automation: never`)"
+            )
+            errors += 1
 
+        surface_flags: list[bool] = []
         for key in ("seo", "aeo", "geo"):
-            if not isinstance(rule.get(key), bool):
+            value = rule.get(key)
+            if not isinstance(value, bool):
                 fail(f"{prefix}.{key} must be boolean")
                 errors += 1
+            else:
+                surface_flags.append(value)
+        if len(surface_flags) == 3 and not any(surface_flags):
+            fail(f"{prefix} must apply to at least one of seo, aeo, or geo")
+            errors += 1
 
         sources = rule.get("sources")
         if not isinstance(sources, list):
             fail(f"{prefix}.sources must be a list")
             errors += 1
         else:
+            if evidence_level == "A" and not sources:
+                fail(f"{prefix} Evidence A rules must cite at least one source-registry ID")
+                errors += 1
+
+            seen_rule_sources: set[str] = set()
             for source_index, source_id in enumerate(sources):
                 source_prefix = f"{prefix}.sources[{source_index}]"
                 if not isinstance(source_id, str) or not source_id.strip():
                     fail(f"{source_prefix} must be a non-empty source-registry ID")
                     errors += 1
-                elif source_id not in source_ids:
+                    continue
+                if source_id in seen_rule_sources:
+                    fail(f"{source_prefix} duplicates source ID: {source_id}")
+                    errors += 1
+                else:
+                    seen_rule_sources.add(source_id)
+                if source_id not in source_ids:
                     fail(f"{source_prefix} unknown source-registry ID: {source_id}")
                     errors += 1
 
@@ -170,13 +197,20 @@ def main() -> int:
                 fail(f"{prefix}.{key} must be non-empty")
                 errors += 1
 
+        if "notes" in rule and (
+            not isinstance(rule["notes"], str) or not rule["notes"].strip()
+        ):
+            fail(f"{prefix}.notes must be a non-empty string when present")
+            errors += 1
+
     if errors:
         print(f"FAILED: {errors} rule validation error(s)")
         return 1
 
     print(
         f"PASS: {len(rules)} rules validated; ids unique; enums, dates, "
-        f"required fields, evidence gates, and {len(source_ids)} source-registry IDs valid."
+        f"required fields, evidence gates, traceability, and {len(source_ids)} "
+        "source-registry IDs valid."
     )
     return 0
 

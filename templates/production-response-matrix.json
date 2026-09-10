@@ -1,0 +1,142 @@
+{
+  "schema_version": "1.0.0",
+  "base_url": "https://example.com",
+  "timeout_seconds": 20,
+  "requests": [
+    {
+      "id": "unknown-default",
+      "path": "/__seo-chief-unknown__",
+      "expect": {
+        "status": [404, 410],
+        "content_type": "text/html",
+        "format": "html",
+        "x_robots_contains": ["noindex"],
+        "body_contains": ["href"]
+      }
+    },
+    {
+      "id": "home-html",
+      "path": "/",
+      "headers": {"Accept": "text/html"},
+      "expect": {
+        "status": 200,
+        "content_type": "text/html",
+        "format": "html",
+        "html": {
+          "title_required": true,
+          "description_required": true,
+          "canonical_required": true,
+          "h1_required": true
+        }
+      }
+    },
+    {
+      "id": "unknown-html",
+      "path": "/__seo-chief-unknown__",
+      "headers": {"Accept": "text/html"},
+      "expect": {
+        "status": [404, 410],
+        "content_type": "text/html",
+        "format": "html",
+        "x_robots_contains": ["noindex"],
+        "body_contains": ["href"]
+      }
+    },
+    {
+      "id": "unknown-markdown",
+      "path": "/__seo-chief-unknown__",
+      "headers": {"Accept": "text/markdown"},
+      "expect": {
+        "status": [404, 410],
+        "content_type": "text/markdown",
+        "format": "markdown",
+        "vary_contains": ["Accept"],
+        "x_robots_contains": ["noindex"],
+        "markdown_links_any": ["/sitemap.xml", "/llms.txt", "/docs"]
+      }
+    },
+    {
+      "id": "unknown-markdown-q-value",
+      "path": "/__seo-chief-unknown__",
+      "headers": {"Accept": "text/markdown;q=0.9, text/html;q=0.8", "Accept-Encoding": "gzip"},
+      "expect": {
+        "status": [404, 410],
+        "content_type": "text/markdown",
+        "format": "markdown",
+        "vary_contains": ["Accept", "Accept-Encoding"]
+      }
+    },
+    {
+      "id": "unknown-direct-markdown",
+      "path": "/__seo-chief-unknown__.md",
+      "headers": {"Accept": "text/markdown"},
+      "expect": {
+        "status": [404, 410],
+        "content_type": "text/markdown",
+        "format": "markdown",
+        "vary_contains": ["Accept"]
+      }
+    },
+    {
+      "id": "robots",
+      "path": "/robots.txt",
+      "expect": {
+        "status": 200,
+        "content_type": "text/plain",
+        "format": "robots",
+        "robots_must_contain": ["Sitemap:"]
+      }
+    },
+    {
+      "id": "sitemap",
+      "path": "/sitemap.xml",
+      "expect": {
+        "status": 200,
+        "content_type": "application/xml",
+        "format": "sitemap",
+        "sitemap_min_urls": 1
+      }
+    },
+    {
+      "id": "private-route",
+      "path": "/account",
+      "expect": {
+        "status": [401, 403],
+        "x_robots_contains": ["noindex"]
+      }
+    },
+    {
+      "id": "asset-favicon",
+      "path": "/favicon.ico",
+      "expect": {"status": [200, 304], "format": "asset"}
+    },
+    {
+      "id": "api-health",
+      "path": "/api/health",
+      "expect": {
+        "status": 200,
+        "content_type_prefix": "application/json",
+        "format": "api",
+        "api_required_keys": ["status"]
+      }
+    },
+    {
+      "id": "canonical-host-redirect",
+      "path": "http://example.com/",
+      "follow_redirects": false,
+      "expect": {
+        "status": [301, 308],
+        "location_contains": ["https://www.example.com/"]
+      }
+    }
+  ],
+  "variant_groups": [
+    {
+      "id": "unknown-path-representations",
+      "response_ids": ["unknown-default", "unknown-html", "unknown-markdown", "unknown-markdown-q-value"],
+      "same_status": true,
+      "different_content_type": true,
+      "vary_contains": ["Accept"]
+    }
+  ]
+}

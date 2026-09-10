@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "<utc-run-id>",
+  "mode": "autopilot",
+  "repository": {
+    "root": "<absolute-repository-root>",
+    "branch": "<branch>",
+    "head_before": "<sha-or-unavailable>",
+    "head_after": "<sha-or-unchanged>",
+    "git_committed": false,
+    "git_pushed": false,
+    "git_merged": false
+  },
+  "production": {
+    "url": "https://example.com",
+    "deployment_model": "<vps-nginx-pm2|cloudflare-pages|cloudflare-workers|vercel|netlify|static|docker|github-pages|browser-panel|not-detected>",
+    "authorized": false,
+    "release_id": "<release-or-unreleased>",
+    "previous_release": "<rollback-reference-or-unavailable>",
+    "config_backup": "<scoped-backup-or-unavailable>",
+    "rollback_command_or_location": "<exact-command-or-location>",
+    "deployment_state": "<not-detected|detected-not-authorized|preflight-failed|released-not-activated|activated-health-failed|rolled-back|deployed-verified|deployed-unverified>",
+    "external_rescan": {
+      "performed": false,
+      "mechanism": "<tool-api-or-unavailable>",
+      "observed_at": "<iso-8601-or-unavailable>"
+    }
+  },
+  "changes": [
+    {
+      "id": "C-001",
+      "finding": "<finding>",
+      "severity": "<blocker|critical|high|medium|low|optional>",
+      "automation_class": "<safe-auto|auto-with-validation|requires-inference|requires-human-info|requires-human-approval|never>",
+      "files": ["<relative-file>"],
+      "routes": ["<url-or-route>"],
+      "evidence": ["<source-or-live-observation>"],
+      "check": "<what was checked>",
+      "expected": "<observable expected state>",
+      "change": "<what changed or why it was skipped>",
+      "local_verification": "<command/result>",
+      "production_verification": "<url/status/header/result-or-unavailable>",
+      "rollback_note": "<exact rollback action or not-needed>",
+      "status": "<implemented|verified|skipped|blocked|failed>"
+    }
+  ],
+  "validation": {
+    "build": "<passed|failed|not-applicable|blocked>",
+    "lint": "<passed|failed|not-applicable|blocked>",
+    "typecheck": "<passed|failed|not-applicable|blocked>",
+    "tests": "<passed|failed|not-applicable|blocked>",
+    "artifact_checks": "<passed|failed|not-applicable|blocked>",
+    "production_response_matrix": "<passed|failed|not-run|blocked>",
+    "remaining_risk": "<concise-evidence-based-risk>"
+  },
+  "decisions": [
+    {
+      "id": "D-001",
+      "finding": "<human decision>",
+      "scope": "<routes-or-project-scope>",
+      "evidence": "<evidence>",
+      "proposed_action": "<action>",
+      "automation_class": "requires-human-approval",
+      "required_human_input": "<exact-input>",
+      "status": "pending"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "SEO Chief"
+  short_description: "One-call SEO, AEO, GEO audit, fixes, release, and validation"
+  default_prompt: "Use $seo-chief in autopilot mode: inspect this repository and production site, implement safe SEO/AEO/GEO fixes, test them, deploy only when authorized, validate live HTTP behavior, and report unresolved decisions in one consolidated table."

@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0.0",
+  "scenarios": [
+    {
+      "id": "one-call-autopilot",
+      "prompt": "Use $seo-chief to optimize the repository and production URL end to end.",
+      "assertions": ["defaults to autopilot", "does not stop after planning", "continues safe work", "reports one decision table"],
+      "required_markers": {"SKILL.md": ["autopilot", "does not stop after producing a plan", "one consolidated decision table"]}
+    },
+    {
+      "id": "nested-dirty-repositories",
+      "prompt": "Optimize a workspace containing a dirty parent checkout and a nested application repository.",
+      "assertions": ["detects nested git boundaries", "preserves unrelated dirty changes", "edits only the resolved project"],
+      "required_markers": {"references/execution-protocol.md": ["nested `.git`", "Preserve unrelated dirty changes", "neighboring repositories"]}
+    },
+    {
+      "id": "vps-nginx-deployment",
+      "prompt": "Fix a website deployed on a shared VPS using Nginx and PM2, then release it.",
+      "assertions": ["detects exact root/site/process/ports", "hashes transfer", "runs nginx -t", "rolls back on health failure"],
+      "required_markers": {"references/deployment-adapters.md": ["VPS + Nginx + PM2", "SHA-256", "nginx -t", "roll back", "neighboring"]}
+    },
+    {
+      "id": "markdown-404-negotiation",
+      "prompt": "Validate an unknown URL in HTML and Markdown modes.",
+      "assertions": ["both variants remain 404/410", "Markdown has real content type", "Markdown exposes recovery links"],
+      "required_markers": {"references/agent-readiness.md": ["Accept: text/markdown", "404", "410", "text/markdown", "recovery link"]}
+    },
+    {
+      "id": "cache-vary-behavior",
+      "prompt": "Audit content negotiation and cache separation for HTML and Markdown responses.",
+      "assertions": ["checks Vary tokens", "tests q-values", "checks Accept-Encoding when compression varies", "does not trust default_type"],
+      "required_markers": {"references/agent-readiness.md": ["Vary", "Accept-Encoding", "q-values", "default_type"]}
+    },
+    {
+      "id": "missing-business-facts",
+      "prompt": "Improve a site whose address, pricing, reviews, and outcomes are not supplied.",
+      "assertions": ["skips unsafe mutations", "continues technical work", "reports exact missing inputs", "does not fabricate facts"],
+      "required_markers": {"SKILL.md": ["Never fabricate contact information", "requires-human-info", "skip only that mutation"]}
+    },
+    {
+      "id": "brand-external-authority-blocker",
+      "prompt": "Make a generic product brand more discoverable when external search results are weak.",
+      "assertions": ["improves truthful on-site signals", "distinguishes external authority", "batches Search Console/listing/press work as blockers"],
+      "required_markers": {"references/agent-readiness.md": ["external authority", "Missing on-site entity signals", "Search Console", "Never create fake brand mentions"]}
+    },
+    {
+      "id": "no-deploy-mode",
+      "prompt": "Use $seo-chief in no-deploy mode and fix safe SEO issues.",
+      "assertions": ["source changes and tests may run", "production activation never occurs", "report records no deployment"],
+      "required_markers": {"SKILL.md": ["no-deploy", "never activate production"]}
+    },
+    {
+      "id": "no-push-mode",
+      "prompt": "Use $seo-chief with no-push while deploying an authorized local release.",
+      "assertions": ["Git push is blocked", "deployment and Git publication remain separate", "report records Git state"],
+      "required_markers": {"SKILL.md": ["no-push", "Never push Git by default", "Git push"]}
+    }
+  ]
+}

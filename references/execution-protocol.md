@@ -63,7 +63,7 @@ Execute these steps in order. A step may be skipped only when it is genuinely no
 15. **Verify production.** Test exact live URLs, status codes, redirects, headers, HTML/Markdown variants, robots, sitemap, JSON-LD, assets, API health, canonical host, and private-route protections.
 16. **Rescan.** If a supported CLI, API, Search Console/Bing mechanism, or public rescan endpoint exists and credentials/scope are available, run one bounded post-release rescan. Otherwise report that no external rescan was available or authorized.
 16A. **Is Agentic closure loop.** Run `references/is-agentic-closure-loop.md` against the public production URL. Read the current Is Agentic report and Prompt to improve, independently verify each failed/partial finding, implement only applicable safe fixes, run the existing local and production gates, selectively re-check affected Ora check IDs, then run a fresh full Essentials score. Repeat while score < 100 and a safe applicable fix remains. Finish only at verified `100/100` or a documented blocker.
-17. **Report verified outcomes.** Return only observed changes, tests, deployment/config state, production evidence, remaining decisions, rollback location/command, risks, and the final Agentic Readiness result.
+17. **Report verified outcomes.** Return only observed changes, tests, deployment/config state, production evidence, remaining decisions, rollback location/command, and risks.
 
 ## Is Agentic continuation rules
 

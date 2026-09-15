@@ -34,12 +34,23 @@ class SkillContractTests(unittest.TestCase):
             "brand-external-authority-blocker",
             "no-deploy-mode",
             "no-push-mode",
+            "is-agentic-closure-loop",
         }
         self.assertTrue(required.issubset(ids))
 
     def test_skill_has_the_report_contract(self) -> None:
         skill = (ROOT / "SKILL.md").read_text(encoding="utf-8").lower()
-        for marker in ("### changed", "### verified", "### blockers", "17.", "no-deploy", "no-push"):
+        for marker in (
+            "### changed",
+            "### verified",
+            "### blockers",
+            "17.",
+            "16a.",
+            "100/100",
+            "prompt to improve",
+            "no-deploy",
+            "no-push",
+        ):
             self.assertIn(marker, skill)
 
 

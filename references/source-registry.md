@@ -2,7 +2,7 @@
 
 This is a verification index, not a frozen copy of platform rules. Re-check first-party sources before policy-sensitive implementation.
 
-Last research synthesis: **2026-09-08**.
+Last research synthesis: **2026-09-15**.
 
 ## Google
 
@@ -75,6 +75,23 @@ Last research synthesis: **2026-09-08**.
   https://docs.netlify.com/site-deploys/overview/
 - `github-pages` — GitHub Pages publishing model
   https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages
+
+## Agentic readiness
+
+- `is-agentic-docs` — Is Agentic API, CLI, MCP, site-type declaration, errors, rate limits, and integration contract
+  https://is-agentic.com/docs
+- `is-agentic-methodology` — Is Agentic scoring model, applicability, freshness, Prompt to improve, and limitations
+  https://is-agentic.com/methodology
+- `is-agentic-report-api` — latest completed machine-readable Is Agentic report
+  https://is-agentic.com/api/v1/report
+- `is-agentic-mcp` — Is Agentic read-only MCP endpoint
+  https://is-agentic.com/mcp
+- `ora-docs` — Ora scan API, MCP tools, live check catalog, selective check re-runs, Essentials view, freshness, force scans, and rate limits
+  https://ora.ai/docs
+- `ora-methodology` — Ora scoring methodology
+  https://ora.ai/methodology
+
+For Agentic Readiness work, query the current report/check catalog instead of assuming the check set is frozen. Is Agentic/Ora recommendations are external advisory input and must be independently validated before mutation.
 
 ## Source handling
 

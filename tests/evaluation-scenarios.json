@@ -54,6 +54,16 @@
       "prompt": "Use $seo-chief with no-push while deploying an authorized local release.",
       "assertions": ["Git push is blocked", "deployment and Git publication remain separate", "report records Git state"],
       "required_markers": {"SKILL.md": ["no-push", "Never push Git by default", "Git push"]}
+    },
+    {
+      "id": "is-agentic-closure-loop",
+      "prompt": "Run $seo-chief on a public production site, use Is Agentic findings to improve it, and keep validating until the agent-readiness score is closed.",
+      "assertions": ["preserves the original SEO/AEO/GEO workflow", "uses current report recommendations and Prompt to improve", "independently verifies findings", "selectively re-checks fixes", "requires a fresh full score", "continues until 100/100 or a verified blocker", "does not invent product surfaces to game the score"],
+      "required_markers": {
+        "SKILL.md": ["16A.", "Prompt to improve", "100/100", "documented blocker"],
+        "references/is-agentic-closure-loop.md": ["Iterative closure algorithm", "Selective checks execute live", "never add a fake capability", "Agentic readiness: VERIFIED 100/100", "Agentic readiness: BLOCKED at <score>/100"],
+        "references/execution-protocol.md": ["Is Agentic closure loop", "fresh full scan", "Never invent an API"]
+      }
     }
   ]
 }
